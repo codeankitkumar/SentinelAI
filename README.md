@@ -16,6 +16,28 @@ SentinelAI is a modular Security Operations Center (SOC) platform that:
   (with PDF export), a rule- or LLM-backed AI assistant, and optional threat
   intelligence lookups (AbuseIPDB / VirusTotal).
 
+## Features
+
+- **Authentication & RBAC** — JWT login, bcrypt hashing, `admin` / `analyst`
+  roles with enforced endpoint authorization and admin user management.
+- **Security monitoring engine** — authorized flow aggregation, feature
+  extraction and explainable detection rules for port scans, brute-force,
+  DDoS indicators, and abnormal traffic (Scapy capture guarded by
+  `NETWORK_MONITOR_ENABLED`; disabled by default).
+- **AI threat detection** — Scikit-learn + XGBoost classification with real
+  (non-fabricated) metrics: precision, recall, F1, confusion matrix, persisted
+  to `ml/models/training_report.json` and surfaced in the UI.
+- **SOC dashboard** — total events, critical incidents, active alerts, attack
+  distribution, network activity over time, top suspicious IPs, recent alerts.
+- **Incident management** — triage alerts, assign severity, add investigation
+  notes, change status, and **export incident reports as PDF**.
+- **AI assistant** — explain, summarize, investigate, remediate, and generate
+  incident reports; offline rule-based by default, with optional OpenAI backing.
+- **Threat intelligence** — AbuseIPDB / VirusTotal reputation lookups that
+  respect rate limits (disabled until API keys are configured).
+- **Threat modeling data** — synthetic generator + `prepare_dataset.py` for
+  public CIC-IDS2017 / UNSW-NB15 datasets.
+
 ## Tech Stack
 
 | Layer     | Technology                                             |
@@ -47,16 +69,30 @@ analyst / Analyst@12345 (Security Analyst)
 ## Repo Layout
 
 ```
-backend/        FastAPI application (API, models, monitor, ML, assistant)
+backend/        FastAPI app (API routers, models, monitor, ML, assistant)
 frontend/       React + Tailwind SPA
-ml/             ML training scripts, feature engineering, dataset prep
-docs/           API docs, lab setup, dataset preparation
-docker-compose.yml
-.env.example
+ml/             ML training scripts, dataset generation/preparation, models
+docs/           API reference, install, lab safety, dataset prep
+docker-compose.yml     Postgres + backend + nginx frontend
+.env.example           environment template (copy to .env)
 ```
 
-See [docs/INSTALL.md](docs/INSTALL.md) for manual/local installation,
-[README full](#deliverables) for the deliverable map, and each section below.
+## Documentation
 
-> **Remote GitHub:** this repo commits locally. To push to a remote, add your
-> repository: `git remote add origin <url>` then `git push -u origin main`.
+| Document | What it covers |
+|----------|----------------|
+| [docs/INSTALL.md](docs/INSTALL.md) | Docker + manual install, config reference |
+| [docs/API.md](docs/API.md) | Full REST endpoint reference & role matrix |
+| [docs/DATASETS.md](docs/DATASETS.md) | Feature schema, training, public dataset prep |
+| [docs/SECURITY_LAB.md](docs/SECURITY_LAB.md) | Authorized-lab & capture guardrails |
+
+## Deliverables map
+
+Complete source code · database schema (SQLAlchemy models, auto-created on
+startup) · API docs · ML training scripts + sample dataset generator · sample
+dataset instructions · Docker configuration · environment template
+(`.env.example`) · this README with installation instructions.
+
+> **Live capture** is disabled by default and is only for authorized lab
+> environments — see [docs/SECURITY_LAB.md](docs/SECURITY_LAB.md) before
+> enabling.
