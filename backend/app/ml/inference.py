@@ -41,7 +41,16 @@ class Inferencer:
         return self._version
 
     def predict(self, row: dict) -> dict:
-        x = extract_features(**row)
+        feats = row.get("features") if isinstance(row.get("features"), dict) else row
+        x = extract_features(
+            duration=feats.get("duration", 0),
+            packet_count=feats.get("packet_count", 0),
+            bytes_sent=feats.get("bytes_sent", 0),
+            bytes_recv=feats.get("bytes_recv", 0),
+            src_port=feats.get("src_port", 0),
+            dst_port=feats.get("dst_port", 0),
+            protocol=row.get("protocol", feats.get("protocol", "tcp")),
+        )
         arr = np.asarray(x, dtype=np.float32).reshape(1, -1)
         if self.model is not None and self.scaler is not None:
             arr = self.scaler.transform(arr)

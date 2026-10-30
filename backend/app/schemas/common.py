@@ -21,7 +21,7 @@ class Page(BaseModel):
     items: list
 
 
-class Severity(BaseModel):
+class Severity:
     """Sentinel severity scale used by alerts & incidents."""
     LOW = "low"
     MEDIUM = "medium"
