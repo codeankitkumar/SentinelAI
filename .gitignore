@@ -25,10 +25,11 @@ yarn-error.log*
 *.pem
 *.key
 
-# Models / data (large artifacts, regenerate with scripts)
-ml/models/*.joblib
-ml/models/*.pkl
-ml/models/*.json
+# Models (committed so the demo works out of the box; regenerate with retrain)
+# ml/models/*.joblib
+# ml/models/*.json
+
+# Large regenerable datasets (download/generate, do not commit)
 ml/datasets/*.csv
 ml/datasets/*.pcap
 *.pcap

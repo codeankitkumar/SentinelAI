@@ -6,8 +6,9 @@ from pathlib import Path
 
 from ..config import settings
 
-# Make model paths relative to the repo root when running from the backend dir.
-_REPO = Path(__file__).resolve().parents[2]
+# Make model paths relative to the repo root so both the API and the training
+# scripts consistently read/write <repo>/ml/models.
+_REPO = Path(__file__).resolve().parents[3]
 
 
 def _resolve(path: str) -> Path:
