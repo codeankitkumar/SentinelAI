@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Node
+node_modules/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Environment & secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Models / data (large artifacts, regenerate with scripts)
+ml/models/*.joblib
+ml/models/*.pkl
+ml/models/*.json
+ml/datasets/*.csv
+ml/datasets/*.pcap
+*.pcap
+*.pcapng
+
+# Private captures — only authorized lab traffic allowed
+captures/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
