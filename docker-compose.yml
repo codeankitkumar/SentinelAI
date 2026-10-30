@@ -1,0 +1,73 @@
+# ============================================================================
+# SentinelAI - AI-Powered Cyber Threat Detection & SOC Platform
+# Local deployment stack: PostgreSQL + FastAPI backend + React/nginx frontend.
+#
+#   cp .env.example .env   # optional; sensible defaults below
+#   docker compose up --build
+#
+#   Frontend : http://localhost:5173   (nginx -> SPA, /api proxied to backend)
+#   Backend  : http://localhost:8000/docs   (Swagger UI)
+#
+# IMPORTANT: Live network capture is DISABLED by default. It requires an
+# authorized lab environment (see docs/SECURITY_LAB.md). The demo/seed data
+# stands in for live traffic until the operator opts in.
+# ============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sentinelai-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sentinel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentinel_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-sentinelai}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sentinel}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sentinelai-backend
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-me-to-a-long-random-string}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://sentinel:sentinel_secret@db:5432/sentinelai}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      SEED_DEMO_EVENTS: ${SEED_DEMO_EVENTS:-2000}
+      ML_MODEL_PATH: ml/models/sentinel_model.joblib
+      ML_SCALER_PATH: ml/models/scaler.joblib
+      NETWORK_MONITOR_ENABLED: ${NETWORK_MONITOR_ENABLED:-false}
+      MONITOR_INTERFACE: ${MONITOR_INTERFACE:-any}
+      ASSISTANT_PROVIDER: ${ASSISTANT_PROVIDER:-rules}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}
+      VIRUSTOTAL_API_KEY: ${VIRUSTOTAL_API_KEY:-}
+      FRONTEND_ORIGIN: http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: sentinelai-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:
