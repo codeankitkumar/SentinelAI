@@ -1,0 +1,10 @@
+# Excluded from the frontend build context.
+node_modules/
+dist/
+*.log
+.vscode
+.idea
+.env
+.env.local
+.sentinel-inspect*
+README.md
